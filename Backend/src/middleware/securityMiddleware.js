@@ -18,7 +18,7 @@ const securityMiddleware = (app) => {
 
   // Enable CORS with customizable origin from env
   const clientUrl = process.env.CLIENT_URL || "http://localhost:5173";
-  const allowedOrigins = [clientUrl, "http://localhost:5173", "http://localhost:5000"];
+  const allowedOrigins = [clientUrl];
 
   app.use(
     cors({
@@ -26,9 +26,10 @@ const securityMiddleware = (app) => {
         // Allow requests with no origin (like mobile apps, curl, postman)
         if (!origin) return callback(null, true);
 
-        // Allow any localhost origin
-        const isLocalhost = /^http:\/\/localhost(:\d+)?$/.test(origin);
-        if (isLocalhost || allowedOrigins.includes(origin)) {
+        const isProduction = process.env.NODE_ENV === "production";
+        const isLocalhost = /^https?:\/\/(localhost|127\.0\.0\.1)(:\d+)?$/.test(origin);
+
+        if (allowedOrigins.includes(origin) || (!isProduction && isLocalhost)) {
           callback(null, true);
         } else {
           callback(new Error("Not allowed by CORS"));
