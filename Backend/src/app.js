@@ -41,6 +41,17 @@ app.use("/api/health",        healthRoutes);
 app.use("/api/admin",         adminRoutes);
 app.use("/api/upload",        uploadRoutes);
 app.use("/api/reviews",       reviewRoutes);
+app.use("*", notFoundHandler);
+
+// ── Root Route ────────────────────────────────────────────────────────────────
+app.get("/", (req, res) => {
+  res.status(200).json({
+    success: true,
+    message: "Fomo Cinema Backend API is running.",
+    status: "OK",
+    version: "1.0.0",
+  });
+});
 
 // ── 404 catch-all ─────────────────────────────────────────────────────────────
 app.use("*", (req, res, next) => {
