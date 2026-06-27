@@ -16,30 +16,35 @@ const securityMiddleware = (app) => {
   // Set security HTTP headers
   app.use(helmet());
 
-  // Enable CORS with customizable origin from env
-  const clientUrl = process.env.CLIENT_URL || "http://localhost:5173";
-  const allowedOrigins = [clientUrl];
+  // Enable CORS — always permit localhost dev origins plus the deployed frontend.
+  // CLIENT_URL from the environment is merged in so Render/staging overrides work too.
+  const allowedOrigins = [
+    "http://localhost:5173",
+    "http://localhost:3000",
+    "https://fomo-cinema.vercel.app",
+    ...(process.env.CLIENT_URL ? [process.env.CLIENT_URL] : []),
+  ].filter((v, i, a) => a.indexOf(v) === i); // deduplicate
 
-  app.use(
-    cors({
-      origin: (origin, callback) => {
-        // Allow requests with no origin (like mobile apps, curl, postman)
-        if (!origin) return callback(null, true);
+  const corsOptions = {
+    origin(origin, callback) {
+      // Allow requests with no origin (mobile apps, curl, Postman, server-to-server)
+      if (!origin) return callback(null, true);
 
-        const isProduction = process.env.NODE_ENV === "production";
-        const isLocalhost = /^https?:\/\/(localhost|127\.0\.0\.1)(:\d+)?$/.test(origin);
+      if (allowedOrigins.includes(origin)) {
+        return callback(null, true);
+      }
 
-        if (allowedOrigins.includes(origin) || (!isProduction && isLocalhost)) {
-          callback(null, true);
-        } else {
-          callback(new Error("Not allowed by CORS"));
-        }
-      },
-      methods: ["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
-      allowedHeaders: ["Content-Type", "Authorization"],
-      credentials: true,
-    })
-  );
+      return callback(new Error("Not allowed by CORS"));
+    },
+    credentials: true,
+    methods: ["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
+    allowedHeaders: ["Content-Type", "Authorization"],
+  };
+
+  // Respond to all OPTIONS preflight requests BEFORE any route or rate-limiter runs
+  app.options("*", cors(corsOptions));
+
+  app.use(cors(corsOptions));
 
   // Apply rate limiting to all api routes
   app.use("/api", limiter);

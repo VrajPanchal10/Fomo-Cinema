@@ -41,7 +41,6 @@ app.use("/api/health",        healthRoutes);
 app.use("/api/admin",         adminRoutes);
 app.use("/api/upload",        uploadRoutes);
 app.use("/api/reviews",       reviewRoutes);
-app.use("*", notFoundHandler);
 
 // ── Root Route ────────────────────────────────────────────────────────────────
 app.get("/", (req, res) => {
