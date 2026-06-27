@@ -6,7 +6,7 @@ A premium, interactive web application for **FoMo Cinema** built using React, Vi
 
 ## 🚀 Live Demo
 
-🔗 **[View Live Portfolio](https://fomo-cinema.vercel.app/)**
+🔗 **[View Live Demo](https://fomo-cinema.vercel.app/)**
 
 ---
 
