@@ -1,0 +1,12 @@
+@import "tailwindcss";
+
+.reviewSwiper .swiper-button-prev,
+.reviewSwiper .swiper-button-next {
+  color: white;
+  transform: scale(0.7);
+}
+
+.reviewSwiper .swiper-button-prev:hover,
+.reviewSwiper .swiper-button-next:hover {
+  color: #e5007d;
+}
